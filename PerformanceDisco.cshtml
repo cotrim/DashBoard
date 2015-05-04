@@ -1,0 +1,20 @@
+@{
+    var db = Database.Open("LocalServer");
+    var data = db.Query("select datepart(MINUTE,logdate) as Dia, avg(ReadTime) as ReadTime, avg(WriteTime) as WriteTime " +
+            "from dbo.TB_Performance_Disco " +
+            "where logDate >= getdate() - 60 " +
+            "group by datepart(MINUTE,logdate) " +
+            "order by datepart(MINUTE,logdate)");
+    var myChart = new Chart(width: 300,
+                        height: 200,
+                        theme: ChartTheme.Green)
+        .AddTitle("Performance Discos (ms)")
+        .AddSeries(name: "Leitura", chartType: "Line",
+	           xValue: data, xField: "Dia",
+    		   yValues: data, yFields: "ReadTime")
+        .AddSeries(name: "Escrita", chartType: "Line",
+	           xValue: data, xField: "Dia",
+    		   yValues: data, yFields: "WriteTime")
+        .AddLegend("Legenda")
+        .Write();
+}

@@ -1,0 +1,58 @@
+<link rel="stylesheet" href="css/reset.css" type="text/css" media="all">
+<link rel="stylesheet" href="css/layout.css" type="text/css" media="all">
+<link rel="stylesheet" href="css/frame.css" type="text/css" media="all">
+<TABLE ALIGN="center" BORDER=0 CELLSPACING=0 CELLPADDING=0 WIDTH="300" HEIGHT=200>
+<TR ALIGN="left" VALIGN="middle">
+	<TH colspan=2>BACKUP FULL</TH>
+</TR>
+<TR ALIGN="left" VALIGN="middle">
+	
+
+@{  var db = Database.Open("LocalServer");
+    var data = db.Query("Select @@servername as Instancia, upper(name) as Banco " +
+			"from master..sysdatabases With (Nolock)  " +
+			"Where status & 2016 = 0  " +
+			"      and name not in (Select database_name From msdb..backupset With (Nolock) where type = 'D')  " +
+			"      and name not in ('tempdb', 'model') " +
+			"Order by name");
+    if (data.Count() > 0) {
+    	<TD width=66><img src='images/semaforovermelho.png' /></TD>
+    	<TD align="left" >@foreach(var row in data){ @row.Banco<br>}</TD>;
+    	
+    	};
+    if (data.Count() == 0) {
+    	<TD colspan=2><img src='images/semaforoverde.png' /></TD>};
+    
+
+}
+</TD>
+</TR>
+</TABLE>
+
+<TABLE ALIGN="center" BORDER=0 CELLSPACING=0 CELLPADDING=0 WIDTH="300" HEIGHT=200>
+<TR ALIGN="left" VALIGN="middle">
+	<TH colspan=2>BACKUP LOG</TH>
+</TR>
+<TR ALIGN="left" VALIGN="middle">
+
+
+@{
+    var Log = db.Query("Select @@servername as Instancia, name as Banco " +
+			"from master.sys.databases With (Nolock)  " +
+			"Where recovery_model_desc = 'SIMPLE' and state = 0 and is_read_only = 0  " +
+			"      and name not in (Select database_name From msdb..backupset With (Nolock) where type = 'L')  " +
+			"      and name not in ('master', 'msdb', 'tempdb', 'model') " +
+			"Order by name");
+    if (Log.Count() > 0) {
+    	<TD width=64><img src='images/semaforovermelho.png' /></TD>
+    	<TD align="left">@foreach(var row in Log){@row.Banco<br>}</TD>;
+    	
+    	};
+    if (Log.Count() == 0) {
+    	<TD colspan=2><img src='images/semaforoverde.png' /></TD>};
+        
+}
+</TD>
+</TR>
+</TABLE>
+

@@ -1,0 +1,13 @@
+@{
+    var db = Database.Open("LocalServer");
+    var data = db.Query("exec dbo.SP_DBA4All_UTILIZACAO_BANCO");
+    var myChart = new Chart(width: 300,
+                        height: 200,
+                        theme: ChartTheme.Green)
+        .AddTitle("Utilização CPU (horas)")
+        .AddSeries(name: "% CPU", chartType: "Bar",
+	           xValue: data, xField: "DatabaseName",
+    		   yValues: data, yFields: "CPU_Time_Ms")
+        .AddLegend("Legenda")
+        .Write();
+}
